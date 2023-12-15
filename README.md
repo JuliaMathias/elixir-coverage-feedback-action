@@ -9,7 +9,6 @@ Additionally, this action supports setting a `working_directory` as an input if 
 ![image](https://user-images.githubusercontent.com/10376340/200857131-94cb2147-d703-4965-be5c-6cd6521826da.png#gh-light-mode-only)
 ![image](https://user-images.githubusercontent.com/10376340/200857627-8232b1de-fcbe-4b68-9f30-df2b89b61ccf.png#gh-dark-mode-only)
 
-
 ## Example of a complete test workflow using the action
 
 `.github/workflows/test.yml`
@@ -67,7 +66,7 @@ jobs:
           mix compile --warnings-as-errors
 
       - name: Tests & Coverage
-        uses: josecfreittas/elixir-coverage-feedback-action@v0.5
+        uses: JuliaMathias/elixir-coverage-feedback-action@v0.5.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           coverage_threshold: 80
