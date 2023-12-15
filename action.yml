@@ -17,6 +17,10 @@ inputs:
     description: "Coverage threshold"
     default: 90
     required: false
+  partition_count:
+    description: "Partition Count"
+    default: 6
+    required: false
   working_directory:
     description: "Working directory"
     default: "."
@@ -28,16 +32,9 @@ runs:
     - name: Tests and coverage
       id: tests
       shell: bash
-      env:
-        ELASTICSEARCH_MAJOR_VERSION: ${{ matrix.elasticsearch_major_version }}
-        ELASTICSEARCH_CLUSTER_0_MAJOR_VERSION: ${{ matrix.elasticsearch_major_version }}
-        ELASTICSEARCH_CLUSTER_1_MAJOR_VERSION: ${{ matrix.elasticsearch_major_version }}
-        DATABASE_URL: postgresql://turn:turn@localhost:5432/turn_dev_${{ matrix.partition }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        MIX_TEST_PARTITION: ${{ matrix.partition }}
       run: |
         cd ${{ inputs.working_directory }}
-        if mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ matrix.partition_count }} 2>&1 | tee coverage_report.log; then echo 'success running the tests'; fi
+        if mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ inputs.partition_count}} 2>&1 | tee coverage_report.log; then echo 'success running the tests'; fi
 
     - name: Feedback comment
       uses: actions/github-script@v6.4.1
