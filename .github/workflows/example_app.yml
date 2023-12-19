@@ -9,7 +9,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: Tests & Checks
+    name: ${{ matrix.partition }} Tests & Checks
+    strategy:
+      fail-fast: false
+      matrix:
+        partition: [1, 2, 3]
+        partition_count: [3]
     defaults:
       run:
         working-directory: ./tests/example_app
@@ -48,3 +53,5 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           coverage_threshold: 90
           working_directory: ./tests/example_app
+          mix_test_partition: ${{ matrix.partition }}
+          partition_count: ${{ matrix.partition_count }}
