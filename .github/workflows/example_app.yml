@@ -57,7 +57,7 @@ jobs:
 
       - name: Coverage
         uses: ./
-        if: matrix.partition == 3
+        if: matrix.partition == 2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           coverage_threshold: 90
