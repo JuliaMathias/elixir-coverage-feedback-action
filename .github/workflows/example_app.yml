@@ -48,14 +48,21 @@ jobs:
           mix compile --warnings-as-errors
 
       - name: Run tests
+        id: run-tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MIX_TEST_PARTITION: ${{ matrix.partition }}
-        run: mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ matrix.partition_count }}
+        run: |
+          if mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ matrix.partition_count }} 2>&1 | tee coverage_report.log; then echo 'success running the tests'; fi
+          echo "TESTS_FINISHED${{ matrix.partition }}=true" >> "$GITHUB_ENV"
 
       - name: Coverage
         uses: ./
-        if: matrix.partition == 1
+        env:
+          TESTS_FINISHED1: ${{ steps.run-tests.TESTS_FINISHED1 }}
+          TESTS_FINISHED2: ${{ steps.run-tests.TESTS_FINISHED2 }}
+          TESTS_FINISHED3: ${{ steps.run-tests.TESTS_FINISHED3 }}
+        if: matrix.partition == 3 && steps.run-tests.outputs.tests_finished1 == 'true' && steps.run-tests.outputs.tests_finished2 == 'true' && steps.run-tests.outputs.tests_finished3 == 'true'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           coverage_threshold: 90
