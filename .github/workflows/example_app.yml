@@ -54,13 +54,40 @@ jobs:
           MIX_TEST_PARTITION: ${{ matrix.partition }}
         run: |
           if mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ matrix.partition_count }} 2>&1 | tee coverage_report.log; then echo 'success running the tests'; fi
+  coverage:
+    runs-on: ubuntu-latest
+    name: Test Coverage
+    needs: test
+    defaults:
+      run:
+        working-directory: ./tests/example_app
+    env:
+      MIX_ENV: test
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Erlang and Elixir
+        uses: erlef/setup-beam@v1.16
+        with:
+          elixir-version: "1.15.0-otp-26"
+          otp-version: "26.0"
+
+      - name: Mix and build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ./tests/example_app/deps
+            ./tests/example_app/_build
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+
+      - name: Get dependencies
+        run: mix deps.get
 
       - name: Coverage
         uses: ./
-        if: matrix.partition == 2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           coverage_threshold: 90
           working_directory: ./tests/example_app
-          mix_test_partition: ${{ matrix.partition }}
-          partition_count: ${{ matrix.partition_count }}
