@@ -25,6 +25,16 @@ inputs:
     description: "Working directory"
     default: "."
     required: false
+  elasticsearch_major_version:
+    description: "Elasticsearch Major Version"
+    required: true
+  database_url:
+    description: "Database URL"
+    required: true
+  mix_test_partition:
+    description: "Mix test partition"
+    default: 6
+    required: true
 
 runs:
   using: "composite"
@@ -32,6 +42,12 @@ runs:
     - name: Tests and coverage
       id: tests
       shell: bash
+      env:
+        ELASTICSEARCH_MAJOR_VERSION: ${{ inputs.elasticsearch_major_version }}
+        ELASTICSEARCH_CLUSTER_0_MAJOR_VERSION: ${{ inputs.elasticsearch_major_version }}
+        ELASTICSEARCH_CLUSTER_1_MAJOR_VERSION: ${{ inputs.elasticsearch_major_version }}
+        DATABASE_URL: ${{ inputs.database_url }}
+        MIX_TEST_PARTITION: ${{ inputs.mix_test_partition }}
       run: |
         cd ${{ inputs.working_directory }}
         if mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ inputs.partition_count}} 2>&1 | tee coverage_report.log; then echo 'success running the tests'; fi
