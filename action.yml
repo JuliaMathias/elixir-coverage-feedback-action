@@ -39,7 +39,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Tests and coverage
+    - name: Tests
       id: tests
       shell: bash
       env:
@@ -51,6 +51,12 @@ runs:
       run: |
         cd ${{ inputs.working_directory }}
         mix test --cover --max-cases=1 --warnings-as-errors --partitions ${{ inputs.partition_count}}
+
+    - name: Coverage
+      id: tests
+      shell: bash
+      run: |
+        cd ${{ inputs.working_directory }}
         if mix test.coverage 2>&1 | tee coverage_report.log; then echo 'success running the tests'; fi
 
     - name: Feedback comment
